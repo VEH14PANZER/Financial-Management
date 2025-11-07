@@ -5,14 +5,14 @@ require_once 'config.php'; // Connects to financialdb ($conn)
 
 // 1. REGISTRATION LOGIC
 if (isset($_POST['register'])) {
-    // 1. INPUTS (No change here, still uses first_name and last_name from form)
+    // 1. INPUTS 
     $first_name = $_POST['first_name'] ?? '';
     $last_name = $_POST['last_name'] ?? '';
     $email = $_POST['email'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role = $_POST['role'];
 
-    // 2. CHECK EMAIL EXISTENCE (No change here)
+    // 2. CHECK EMAIL EXISTENCE 
     $stmt_check = $conn->prepare("SELECT email FROM users WHERE email = ?");
     $stmt_check->bind_param("s", $email);
     $stmt_check->execute();
@@ -66,11 +66,10 @@ if (isset($_POST['register'])) {
             }
         } // end if role is 'user'
 
-        // --- PHASE 2: CREATE USERS_DB LOGIN RECORD ---
+        // PHASE 2: CREATE USERS_DB LOGIN RECORD 
         if (!$db_error) {
             $stmt_insert = null;
             
-            // ** MODIFICATION START **
             if ($role === 'user') {
                 // Query for 'user' role: includes new columns AND Customer_ID
                 $sql_insert = "INSERT INTO users (First_name, Last_name, email, password, role, Customer_ID) VALUES (?, ?, ?, ?, ?, ?)";
@@ -140,4 +139,5 @@ if (isset($_POST['login'])) {
     header("Location: index.php");
     exit();
 }
+
 ?>
