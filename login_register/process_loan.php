@@ -27,7 +27,7 @@ $details = trim($_POST['details'] ?? '');
 $loan_amount = (float)($_POST['loan_amount'] ?? 0.00);
 $branch_id = (int)($_POST['branch_id'] ?? 0);
 
-// FIX 1: Convert float amount to a safe string for all SQL bindings
+//  1: Convert float amount to a safe string for all SQL bindings
 $loan_amount_str = number_format($loan_amount, 2, '.', '');
 
 // Check if all necessary IDs and values are set
@@ -75,7 +75,7 @@ try {
                  VALUES (?, ?, ?, ?, ?, NULL, ?, ?)";
     $stmt_loan = $bank_conn->prepare($sql_loan);
     
-    // FIX 2: Use 's' (string) for $loan_amount_str instead of 'd' (double)
+    // 2: Use 's' (string) for $loan_amount_str instead of 'd' (double)
     $stmt_loan->bind_param("iisssss", $customer_id, $loan_type_id, $branch_id, $loan_amount_str, $application_date, $details, $current_time);
 
     if (!$stmt_loan->execute()) {
@@ -88,7 +88,7 @@ try {
                         VALUES (?, ?, ?, ?, ?, ?)";
     $stmt_transaction = $bank_conn->prepare($sql_transaction);
     
-    // FIX 3: Use 's' (string) for $loan_amount_str instead of 'd'
+    // 3: Use 's' (string) for $loan_amount_str instead of 'd'
     $stmt_transaction->bind_param("ssiiis", $transaction_type, $loan_amount_str, $BANK_ACCOUNT_ID, $deposit_account_id, $branch_id, $current_time);
 
     if (!$stmt_transaction->execute()) {
@@ -111,4 +111,5 @@ try {
 }
 
 $bank_conn->close();
+
 ?>
