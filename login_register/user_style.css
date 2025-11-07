@@ -1,4 +1,3 @@
-/* --- USER PAGE STYLES (user_page.php) */
 /* 1. BASE LAYOUT: Grid setup for Sidebar and Main Content */
 body.user-page {
     /* SIDE BAR */
@@ -190,4 +189,5 @@ body.user-page {
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
+
 }
