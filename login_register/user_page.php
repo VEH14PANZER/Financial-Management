@@ -18,9 +18,7 @@ if (!$customer_id) {
     die("CRITICAL ERROR: Customer ID is missing from your session. Please check your login process.");
 }
 
-// =================================================================
 // MESSAGE HELPER FUNCTIONS
-// =================================================================
 function showError($error) {
     return !empty($error) ? "<p class='message error-message'>$error</p>" : '';
 }
@@ -29,17 +27,13 @@ function showSuccess($message) {
     return !empty($message) ? "<p class='message success-message'>$message</p>" : ''; 
 }
 
-// =================================================================
-// 0. MESSAGE HANDLING
-// =================================================================
+// MESSAGE HANDLING
 $success_message = $_SESSION['success_message'] ?? '';
 $error_message = $_SESSION['error_message'] ?? '';
 unset($_SESSION['success_message']);
 unset($_SESSION['error_message']);
 
-// =================================================================
 // 1. Fetch Customer Data
-// =================================================================
 $customer_data = null;
 // Removed the incorrect condition from the customer table query.
 $stmt_customer = $bank_conn->prepare("SELECT First_name, Last_name FROM customer WHERE Customer_ID = ?"); 
@@ -51,9 +45,7 @@ if ($result_customer->num_rows > 0) {
 }
 $stmt_customer->close();
 
-// =================================================================
 // 2. Fetch Active Accounts (Needed for both Deposit and Loan Application)
-// =================================================================
 $accounts_data = [];
 $sql_accounts = "
     SELECT 
@@ -76,9 +68,7 @@ while ($row = $accounts_result->fetch_assoc()) {
 $account_count = count($accounts_data);
 $stmt_accounts->close();
 
-// =================================================================
 // 3. Fetch Loan History (Used by Dashboard and Transactions Tab)
-// =================================================================
 $loan_history = [];
 $sql_loan_history = "
     SELECT 
@@ -102,9 +92,7 @@ while ($row = $loan_history_result->fetch_assoc()) {
 $stmt_loan_history->close();
 
 
-// =================================================================
 // 4. Fetch Transaction History (NEW)
-// =================================================================
 $transaction_history = [];
 $account_ids = array_column($accounts_data, 'Account_ID'); // Get all user's active Account IDs
 $BANK_ACCOUNT_ID = 999999; // Define the bank's internal account ID (used in process_transaction.php)
@@ -139,14 +127,12 @@ if (!empty($account_ids)) {
 }
 
 
-// =================================================================
 // 5. Fetch Loan Types (for Apply Loan form)
-// =================================================================
 $loan_types = [];
 // Updated default limit to a higher value based on user's confirmed data (100000.00)
 $max_global_loan_limit = 100000.00; 
 
-// FIX: Use 'Max_Loan_Amount' which matches the user's database column name instead of 'Loan_Limit'.
+// Use 'Max_Loan_Amount' which matches the user's database column name instead of 'Loan_Limit'.
 $sql_loan_types = "SELECT Loan_Type_ID, Loan_Type_Name, Max_Loan_Amount FROM loan_type";
 $result_loan_types = $bank_conn->query($sql_loan_types);
 
@@ -160,9 +146,7 @@ if ($result_loan_types && $result_loan_types->num_rows > 0) {
     }
 } 
 
-// =================================================================
 // 6. Active Tab Logic
-// =================================================================
 $allowed_tabs = ['dashboard', 'accounts', 'apply_loan', 'transactions']; 
 // NOTE: Updated 'loan_application' to 'apply_loan' in the logic to match form name
 $active_tab = $_GET['tab'] ?? 'dashboard';
@@ -441,11 +425,10 @@ if (!in_array($active_tab, $allowed_tabs)) {
                                         $is_inflow = in_array($tx['to_account_ID'], $account_ids);
                                         $flow_sign = $is_inflow ? '+' : '-';
                                         $flow_class = $is_inflow ? 'inflow' : 'outflow';
-                                        $icon = $is_inflow ? '⬇️' : '⬆️'; // Down arrow for money in, up arrow for money out
+                                        $icon = $is_inflow ? '⬇️' : '⬆️';
                                         $transaction_type_display = htmlspecialchars($tx['Transaction_type']);
 
-                                        // Determine the source/destination text for display
-                                        $BANK_ACCOUNT_ID = 999999; // Re-define locally for use here
+                                        $BANK_ACCOUNT_ID = 999999;
 
                                         if ($tx['from_account_ID'] == $BANK_ACCOUNT_ID) {
                                             $detail_text = "From **Bank** to Account #**" . $tx['to_account_ID'] . "**";
@@ -509,4 +492,5 @@ if (!in_array($active_tab, $allowed_tabs)) {
     </script>
 </body>
 </html>
+
 <?php $bank_conn->close(); ?>
